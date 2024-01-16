@@ -74,14 +74,24 @@ struct ContentView: View {
     
     private func addItem(_ product: ProductJSON) {
         withAnimation {
-            let newItem = Product(context: viewContext)
-            newItem.id = Int16(product.id!)
-            newItem.title = product.title
-            newItem.price = product.price!
-            newItem.category = product.category
-            newItem.notes = product.description
-            newItem.image = product.image
             
+            if coreDataProducts.contains(where: { p in
+                p.id == product.id!
+            })
+            {
+                coreDataProducts.first(where: { p in p.id == product.id!})!.quantity = coreDataProducts.first(where: { p in p.id == product.id!})!.quantity + 1 
+            }
+            else
+            {
+                let newItem = Product(context: viewContext)
+                newItem.id = Int16(product.id!)
+                newItem.title = product.title
+                newItem.price = product.price!
+                newItem.category = product.category
+                newItem.notes = product.description
+                newItem.image = product.image
+                newItem.quantity = 1
+            }
             do {
                 try viewContext.save()
             } catch {
@@ -105,8 +115,8 @@ struct ItemsSaved: View {
                 ForEach(coreDataProducts, id: \.id) { product in
                     VStack {
                         VStack (alignment: .leading) {
-                            Text("\(product.id)")
-                            Text("\(product.title!)")
+                            Text("Amount:\(product.quantity)")
+                            Text("\(product.title ?? "")")
                                 .lineLimit(1)
                         }
                     }
